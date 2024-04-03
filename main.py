@@ -28,7 +28,13 @@ for i in range(len(vecs)-1):
         if np.linalg.norm(vecs[i]-vecs[j]) == 2:
             connections.append([i, j])
 
-a, b, c, d = -1, 1, 1, 2
+# vecs = vecs * np.array([0.5, 2, 1.5, 0.75])
+
+
+
+
+
+a, b, c, d = 0, 0, 0, 1
 n = np.linalg.norm(np.array([a, b, c, d]))
 
 basis = np.array([
@@ -53,7 +59,6 @@ data = vecs @ o_base.T
 xs = data[:, 0]
 ys = data[:, 1]
 zs = data[:, 2]
-print(xs.shape)
 lines = []
 for i, j in connections:
     lines.append(ax.plot([xs[i], xs[j]], [ys[i], ys[j]], [zs[i], zs[j]])[0])
