@@ -30,10 +30,6 @@ for i in range(len(vecs)-1):
 
 # vecs = vecs * np.array([0.5, 2, 1.5, 0.75])
 
-
-
-
-
 a, b, c, d = 0, 0, 0, 1
 n = np.linalg.norm(np.array([a, b, c, d]))
 
