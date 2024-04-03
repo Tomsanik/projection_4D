@@ -28,22 +28,22 @@ for i in range(len(vecs)-1):
         if np.linalg.norm(vecs[i]-vecs[j]) == 2:
             connections.append([i, j])
 
-# vecs = vecs * np.array([0.5, 2, 1.5, 0.75])
+vecs = vecs * np.array([1, 1, 1, 1])
 
+S = np.array([0, 0, 0, 4])
+p = 0.25
 
-A = np.array([2, 2, 2, 2])
-p = 0.2
+n = -S
+nm = np.linalg.norm(n)
+n = n/nm
 
-
-
-a, b, c, d = 0, 0, 0, 1
-n = np.linalg.norm(np.array([a, b, c, d]))
+a, b, c, d = n
 
 basis = np.array([
     [b, -a, d, -c],
     [c, d, -a, -b],
     [d, c, -b, -a]
-])/n
+]) / nm
 
 u = basis[1] - (basis[1] @ basis[0])*basis[0]
 u = u/np.linalg.norm(u)
@@ -55,15 +55,18 @@ o_base = np.array([basis[0], u, v])
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 ax.set_aspect("equal")
+# ax.set_axis_off()
 
-data = vecs @ o_base.T
-# data = vecs[:, 0:3]
-xs = data[:, 0]
-ys = data[:, 1]
-zs = data[:, 2]
+Bs = (vecs-S).T
+n = n.reshape(4, 1)
+data = o_base @ (p*(Bs/(n.T @ Bs) - n))
+
+xs = data[0, :]
+ys = data[1, :]
+zs = data[2, :]
 lines = []
 for i, j in connections:
-    lines.append(ax.plot([xs[i], xs[j]], [ys[i], ys[j]], [zs[i], zs[j]])[0])
+    lines.append(ax.plot([xs[i], xs[j]], [ys[i], ys[j]], [zs[i], zs[j]], marker='o')[0])
 
 
 def update(frame):
@@ -74,21 +77,25 @@ def update(frame):
         [0, 0, 1, 0],
         [0, -np.sin(phi), 0, np.cos(phi)]
     ])
-    data = (R @ vecs.T).T @ o_base.T
-    # data = (R@vecs.T).T[:, 0:3]
-    xs = data[:, 0]
-    ys = data[:, 1]
-    zs = data[:, 2]
+    rvecs = R @ vecs.T
+    Bs = (rvecs.T-S).T
+    data = o_base @ (p * (Bs / (n.T @ Bs) - n))
+
+    xs = data[0, :]
+    ys = data[1, :]
+    zs = data[2, :]
     for line, ij in zip(lines, connections):
         i, j = ij
         line.set_data(np.array([[xs[i], xs[j]],
                                 [ys[i], ys[j]]]))
         line.set_3d_properties([zs[i], zs[j]])
+    global ax
+    ax.view_init(elev=30, azim=45+phi*180/np.pi/5)
 
 
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps=30, metadata=dict(artist='Me'), bitrate=1800*200)
 
 ani = animation.FuncAnimation(fig=fig, func=update, frames=30*10, interval=100/3)
-# ani.save('lines_circle.mp4', writer=writer)
-plt.show()
+ani.save('projection.mp4', writer=writer)
+# plt.show()
