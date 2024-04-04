@@ -2,45 +2,59 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 
+vecs = []
+for x in [-1, 1]:
+    for y in [-1, 1]:
+        for z in [-1, 1]:
+            for w in [-1, 1]:
+                vecs.append([x, y, z, w])
+vecs = np.array(vecs)
 
-vecs = np.array([
-    [1, 1, 1, 1],
-    [1, 1, 1, -1],
-    [1, 1, -1, 1],
-    [1, -1, 1, 1],
-    [-1, 1, 1, 1],
-    [1, 1, -1, -1],
-    [1, -1, 1, -1],
-    [-1, 1, 1, -1],
-    [1, -1, -1, 1],
-    [-1, 1, -1, 1],
-    [-1, -1, 1, 1],
-    [-1, -1, -1, 1],
-    [-1, -1, 1, -1],
-    [-1, 1, -1, -1],
-    [1, -1, -1, -1],
-    [-1, -1, -1, -1]
-])
+# vecs = np.array([
+#     [1, 1, 1, 1],
+#     [1, 1, 1, -1],
+#     [1, 1, -1, 1],
+#     [1, -1, 1, 1],
+#     [-1, 1, 1, 1],
+#     [1, 1, -1, -1],
+#     [1, -1, 1, -1],
+#     [-1, 1, 1, -1],
+#     [1, -1, -1, 1],
+#     [-1, 1, -1, 1],
+#     [-1, -1, 1, 1],
+#     [-1, -1, -1, 1],
+#     [-1, -1, 1, -1],
+#     [-1, 1, -1, -1],
+#     [1, -1, -1, -1],
+#     [-1, -1, -1, -1]
+# ])
 
 connections = []
 vecs2 = []
-k = len(vecs)-1
+m = 1
+kon = len(vecs)
 for i in range(len(vecs)-1):
     for j in range(i, len(vecs)):
         if np.linalg.norm(vecs[i]-vecs[j]) == 2:
-            k += 1
-            connections.append([i, k])
-            connections.append([k, j])
-            vecs2.append((vecs[i]+vecs[j])/2)
+            v = vecs[j]-vecs[i]
+            zac = i
+            for q in range(1, m, 1):
+                nv = vecs[i] + v*q / m
+                nv = 2*nv/np.linalg.norm(nv)
+                vecs2.append(nv)
+                connections.append([zac, kon])
+                zac = kon
+                kon += 1
+            connections.append([zac, j])
 
-vecs2 = list(np.array(vecs2)*1.2)
-print(vecs.shape)
+            # connections.append([i, j])
+
+# vecs2 = list(np.array(vecs2)*1.2)
 vecs = np.array(list(vecs) + vecs2)
-print(vecs.shape)
 
 vecs = vecs * np.array([1, 1, 1, 1])
 
-S = np.array([0, 0, 0, 3])
+S = np.array([0, 3, 0, 0])
 p = 0.25
 
 n = -S
@@ -53,7 +67,7 @@ basis = np.array([
     [b, -a, d, -c],
     [c, d, -a, -b],
     [d, c, -b, -a]
-]) / nm
+])
 
 u = basis[1] - (basis[1] @ basis[0])*basis[0]
 u = u/np.linalg.norm(u)
