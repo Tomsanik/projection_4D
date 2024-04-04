@@ -19,18 +19,28 @@ vecs = np.array([
     [-1, -1, 1, -1],
     [-1, 1, -1, -1],
     [1, -1, -1, -1],
-    [-1, -1, -1, -1],
+    [-1, -1, -1, -1]
 ])
 
 connections = []
+vecs2 = []
+k = len(vecs)-1
 for i in range(len(vecs)-1):
     for j in range(i, len(vecs)):
         if np.linalg.norm(vecs[i]-vecs[j]) == 2:
-            connections.append([i, j])
+            k += 1
+            connections.append([i, k])
+            connections.append([k, j])
+            vecs2.append((vecs[i]+vecs[j])/2)
+
+vecs2 = list(np.array(vecs2)*1.2)
+print(vecs.shape)
+vecs = np.array(list(vecs) + vecs2)
+print(vecs.shape)
 
 vecs = vecs * np.array([1, 1, 1, 1])
 
-S = np.array([0, 0, 0, 4])
+S = np.array([0, 0, 0, 3])
 p = 0.25
 
 n = -S
@@ -90,12 +100,12 @@ def update(frame):
                                 [ys[i], ys[j]]]))
         line.set_3d_properties([zs[i], zs[j]])
     global ax
-    ax.view_init(elev=30, azim=45+phi*180/np.pi/5)
+    # ax.view_init(elev=30, azim=45+phi*180/np.pi/5)
 
 
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps=30, metadata=dict(artist='Me'), bitrate=1800*200)
 
 ani = animation.FuncAnimation(fig=fig, func=update, frames=30*10, interval=100/3)
-ani.save('projection.mp4', writer=writer)
-# plt.show()
+# ani.save('projection.mp4', writer=writer)
+plt.show()
